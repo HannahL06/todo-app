@@ -1,0 +1,50 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  runtime      = "nodejs"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ItemType {
+  TASK
+  NOTE
+  APPOINTMENT
+}
+
+enum DailyItemStatus {
+  UNTOUCHED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Item {
+  id            String      @id @default(cuid())
+  name          String
+  description   String?
+  type          ItemType    @default(TASK)
+  isRolling     Boolean     @default(true)
+  scheduledDate DateTime    @db.Date
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  dailyItems    DailyItem[]
+}
+
+model DailyItem {
+  id               String          @id @default(cuid())
+  itemId           String
+  date             DateTime        @db.Date
+  status           DailyItemStatus @default(UNTOUCHED)
+  notes            String?
+  sortOrder        Int?
+  removedFromToday Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  item             Item            @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, date])
+  @@index([date, removedFromToday, sortOrder])
+}

@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.*
+client/node_modules/
+client/dist/
+server/node_modules/
+server/dist/
+server/coverage/
+server/prisma/dev.db
+server/prisma/dev.db-journal
+.vscode/
+.DS_Store

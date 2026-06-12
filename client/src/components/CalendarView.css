@@ -1,0 +1,71 @@
+.calendar-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-primary);
+}
+
+.calendar-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-xl);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--spacing-md);
+}
+
+.calendar-day-header {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: var(--spacing-md);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calendar-cell {
+  aspect-ratio: 1;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  background-color: var(--bg-tertiary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-height: 100px;
+  transition: all 200ms ease;
+  cursor: pointer;
+}
+
+.calendar-cell.active:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--purple-main);
+  box-shadow: 0 4px 12px rgba(139, 95, 191, 0.2);
+}
+
+.calendar-cell.empty {
+  background-color: rgba(0, 0, 0, 0.02);
+  border-color: transparent;
+  cursor: default;
+}
+
+.day-number {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .calendar-grid {
+    gap: var(--spacing-sm);
+  }
+
+  .calendar-cell {
+    min-height: 80px;
+    font-size: 12px;
+  }
+}

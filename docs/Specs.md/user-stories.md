@@ -56,13 +56,13 @@ As a user, I want to click one checkbox to cycle item status so progress trackin
 
 Acceptance criteria:
 Given an item is on a daily list
-When I click the checkbox once
+When I click the status control once
 Then status changes to the next state in order: untouched -> in-progress -> completed
 
 Given the status changes
 When the update is applied
 Then the status is persisted in storage
-And the UI color reflects status: gray untouched, green in-progress, purple completed
+And the UI status badge reflects status with the corresponding state class
 
 ### US-05 Parent completion cascades to children
 As a user, I want child tasks to complete when the parent completes so nested work stays synchronized.
@@ -133,7 +133,7 @@ Then each day shows the correct date
 
 Given a day has at least one task or appointment
 When that day cell is displayed
-Then it shows an ellipsis indicator and item count
+Then appointment items are shown by name inside that day cell
 
 ### US-12 Manage multiple standalone lists
 As a user, I want multiple standalone lists where I can add/edit tasks and notes for focused planning.
@@ -168,7 +168,10 @@ Then a search bar appears at the top
 Given I enter a name query
 When results are returned
 Then only matching items are shown
-And timeline shows day-by-day progression for those matches
+And each result shows basic metadata (date, type, status) for quick review
+
+Note:
+Timeline rendering is not in v1 demo scope yet. Current implementation provides shallow text search with flat result cards.
 
 ### US-15 Filter and sort search results
 As a user, I want to filter and sort search results so I can investigate trends quickly.

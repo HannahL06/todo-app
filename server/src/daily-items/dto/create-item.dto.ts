@@ -1,4 +1,4 @@
-import { IsIn, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import { IsBoolean, IsIn, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 
 const itemTypes = ['task', 'note', 'appointment'] as const;
 
@@ -15,6 +15,10 @@ export class CreateItemDto {
   @IsOptional()
   @IsIn(itemTypes)
   type?: (typeof itemTypes)[number];
+
+  @IsOptional()
+  @IsBoolean()
+  isRolling?: boolean;
 
   @Matches(/^\d{4}-\d{2}-\d{2}$/)
   scheduledDate!: string;

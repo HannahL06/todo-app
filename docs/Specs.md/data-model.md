@@ -157,16 +157,4 @@ Named grouping of Items.
 - User ownership is explicitly stored (not inferred)
 ```
 
----'                                               '
-## User Stories
-
-## Status
-
-- [x] Database chosen
-- [x] ORM chosen
-- [x] Backend framework chosen
-- [x] Frontend framework chosen
-- [x] Database schema designed
-- [x] User stories written
-- [ ] Project scaffolded
-- [ ] Implementation started
+---'         

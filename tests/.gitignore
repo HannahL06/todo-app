@@ -1,0 +1,17 @@
+# Playwright test artifacts
+test-results/
+playwright-report/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+*.swp
+*.swo
+*~

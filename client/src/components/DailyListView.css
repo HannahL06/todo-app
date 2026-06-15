@@ -5,6 +5,93 @@
   background-color: var(--bg-primary);
 }
 
+/* ── Day navigation ── */
+.date-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex: 1;
+}
+
+.date-nav-center {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+}
+
+.date-nav-arrow {
+  font-size: 28px;
+  line-height: 1;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  padding: 0 var(--spacing-sm);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 150ms ease, background-color 150ms ease;
+  flex-shrink: 0;
+}
+
+.date-nav-arrow:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-hover);
+}
+
+.btn-today {
+  font-size: var(--font-sm);
+  padding: 2px var(--spacing-md);
+  border-radius: 99px;
+  background-color: var(--purple-main);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 150ms ease;
+  white-space: nowrap;
+}
+
+.btn-today:hover {
+  opacity: 1;
+}
+
+.item-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+  opacity: 0;
+  transition: opacity 150ms ease;
+  flex-shrink: 0;
+}
+
+.item-row:hover .item-actions {
+  opacity: 1;
+}
+
+.item-action-btn {
+  font-size: 11px;
+  padding: 2px var(--spacing-sm);
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 150ms ease;
+  line-height: 1.4;
+}
+
+.item-action-btn:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.item-action-btn.danger:hover {
+  border-color: #e57373;
+  color: #e57373;
+  background: rgba(229, 115, 115, 0.08);
+}
+
 .daily-items-container {
   flex: 1;
   overflow-y: auto;
@@ -26,42 +113,20 @@
   background-color: var(--bg-tertiary);
   border-radius: 0;
   transition: background-color 200ms ease;
+  cursor: default;
 }
 
 .item-row:hover {
   background-color: var(--bg-hover);
 }
 
-.item-marker {
-  flex-shrink: 0;
-  font-size: var(--font-lg);
-  cursor: grab;
-  padding-top: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
+.item-row.is-dragging {
+  opacity: 0.55;
 }
 
-.item-marker:active {
-  cursor: grabbing;
-}
-
-.status-dot {
-  display: inline-block;
-  transition: color 200ms ease;
-}
-
-.status-dot.status-incomplete {
-  color: var(--status-incomplete);
-}
-
-.status-dot.status-in-progress {
-  color: var(--status-in-progress);
-}
-
-.status-dot.status-completed {
-  color: var(--status-completed);
+.item-row.is-drop-target {
+  outline: 2px dashed var(--purple-main);
+  outline-offset: -4px;
 }
 
 .item-content {
@@ -73,6 +138,15 @@
   font-weight: 500;
   color: var(--text-primary);
   margin-bottom: var(--spacing-xs);
+}
+
+.item-name.drag-handle {
+  cursor: grab;
+  user-select: none;
+}
+
+.item-name.drag-handle:active {
+  cursor: grabbing;
 }
 
 .item-description {
@@ -102,6 +176,8 @@
   font-weight: 500;
   text-transform: capitalize;
   white-space: nowrap;
+  border: none;
+  cursor: pointer;
 }
 
 .status-badge.status-incomplete {

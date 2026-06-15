@@ -58,6 +58,28 @@
   gap: var(--spacing-sm);
 }
 
+.form-group-inline {
+  flex-direction: row;
+  align-items: center;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+.toggle-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--purple-main);
+  cursor: pointer;
+}
+
 .form-label {
   font-size: var(--font-base);
   font-weight: 500;

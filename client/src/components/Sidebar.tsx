@@ -1,4 +1,3 @@
-import React from 'react'
 import './Sidebar.css'
 
 export type ViewType = 'daily' | 'calendar' | 'lists' | 'search' | 'records'
@@ -18,7 +17,7 @@ const views: Array<{ id: ViewType; icon: string; label: string }> = [
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" data-testid="sidebar">
       {views.map((view) => (
         <button
           key={view.id}
@@ -26,6 +25,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           onClick={() => onViewChange(view.id)}
           title={view.label}
           aria-label={view.label}
+          data-testid={`nav-${view.id}`}
         >
           {view.icon}
         </button>

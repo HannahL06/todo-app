@@ -10,30 +10,6 @@ import './App.css'
 
 function App() {
   const [activeView, setActiveView] = useState<ViewType>('daily')
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          description: description.trim() || null,
-          type,
-          scheduledDate: selectedDate,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Could not create that item.')
-      }
-
-      const createdItem: DailyItem = await response.json()
-      setItems((currentItems) => [...currentItems, createdItem])
-      setName('')
-      setDescription('')
-      setType('task')
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Could not create that item.')
-    } finally {
-      setIsSaving(false)
-    }
-  }
 
   return (
     <div className="app-container">
@@ -51,7 +27,5 @@ function App() {
     </div>
   )
 }
-
-export default App
 
 export default App

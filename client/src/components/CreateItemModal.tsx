@@ -3,9 +3,21 @@ import './CreateItemModal.css'
 
 type ItemType = 'task' | 'note' | 'appointment'
 
+interface CreateItemFormData {
+  type: ItemType
+  name: string
+  description: string | null
+  notes: string | null
+  time: string | null
+  status: 'untouched'
+  sortOrder: number | null
+  isRolling: boolean
+  scheduledDate: string
+}
+
 interface CreateItemModalProps {
   onClose: () => void
-  onSubmit: (data: any) => Promise<void>
+  onSubmit: (data: CreateItemFormData) => Promise<void>
   initialDate: string
 }
 
@@ -15,6 +27,8 @@ export function CreateItemModal({ onClose, onSubmit, initialDate }: CreateItemMo
   const [description, setDescription] = useState('')
   const [notes, setNotes] = useState('')
   const [time, setTime] = useState('12:00')
+  const [scheduledDate, setScheduledDate] = useState(initialDate)
+  const [isRolling, setIsRolling] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -38,8 +52,8 @@ export function CreateItemModal({ onClose, onSubmit, initialDate }: CreateItemMo
         time: type === 'appointment' ? time : null,
         status: 'untouched',
         sortOrder: null,
-        isRolling: false,
-        scheduledDate: initialDate,
+        isRolling,
+        scheduledDate,
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create item')
@@ -50,15 +64,20 @@ export function CreateItemModal({ onClose, onSubmit, initialDate }: CreateItemMo
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="create-item-modal">
         <h2 className="modal-header">Create New Item</h2>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && <div className="error-message" data-testid="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="create-form">
           <div className="form-group">
             <label className="form-label">Type</label>
-            <select value={type} onChange={(e) => setType(e.target.value as ItemType)} className="form-select">
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value as ItemType)}
+              className="form-select"
+              data-testid="item-type-select"
+            >
               <option value="task">Task</option>
               <option value="appointment">Appointment</option>
               <option value="note">Note</option>
@@ -73,6 +92,7 @@ export function CreateItemModal({ onClose, onSubmit, initialDate }: CreateItemMo
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter task name"
               className="form-input"
+              data-testid="item-name-input"
               required
             />
           </div>
@@ -84,7 +104,20 @@ export function CreateItemModal({ onClose, onSubmit, initialDate }: CreateItemMo
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add details (optional)"
               className="form-textarea"
+              data-testid="item-description-input"
               rows={3}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Scheduled Date</label>
+            <input
+              type="date"
+              value={scheduledDate}
+              onChange={(e) => setScheduledDate(e.target.value)}
+              className="form-input"
+              data-testid="item-date-input"
+              required
             />
           </div>
 
@@ -111,11 +144,31 @@ export function CreateItemModal({ onClose, onSubmit, initialDate }: CreateItemMo
             </div>
           )}
 
+          {type !== 'note' && (
+            <div className="form-group form-group-inline">
+              <label className="toggle-label">
+                <input
+                  type="checkbox"
+                  checked={isRolling}
+                  onChange={(e) => setIsRolling(e.target.checked)}
+                  data-testid="item-rolling-input"
+                />
+                <span>Roll forward if not completed</span>
+              </label>
+            </div>
+          )}
+
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={isSubmitting}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={onClose}
+              disabled={isSubmitting}
+              data-testid="cancel-button"
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting} data-testid="create-button">
               {isSubmitting ? 'Creating...' : 'Create'}
             </button>
           </div>

@@ -51,6 +51,7 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  User: 'User',
   Item: 'Item',
   DailyItem: 'DailyItem'
 } as const
@@ -71,8 +72,21 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
 export const ItemScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   name: 'name',
   description: 'description',
   type: 'type',
@@ -88,6 +102,7 @@ export type ItemScalarFieldEnum = (typeof ItemScalarFieldEnum)[keyof typeof Item
 export const DailyItemScalarFieldEnum = {
   id: 'id',
   itemId: 'itemId',
+  userId: 'userId',
   date: 'date',
   status: 'status',
   notes: 'notes',

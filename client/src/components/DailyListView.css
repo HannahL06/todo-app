@@ -102,22 +102,27 @@
 .daily-items-list {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-xl);
 }
 
 .item-row {
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-bottom: 1px solid var(--border-color);
+  padding: var(--spacing-lg);
   display: flex;
   gap: var(--spacing-lg);
   align-items: flex-start;
-  background-color: var(--bg-tertiary);
-  border-radius: 0;
-  transition: background-color 200ms ease;
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(123, 88, 168, 0.08);
+  transition: transform 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
   cursor: default;
 }
 
 .item-row:hover {
-  background-color: var(--bg-hover);
+  background-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(123, 88, 168, 0.14);
 }
 
 .item-row.is-dragging {
@@ -126,7 +131,7 @@
 
 .item-row.is-drop-target {
   outline: 2px dashed var(--purple-main);
-  outline-offset: -4px;
+  outline-offset: 2px;
 }
 
 .item-content {

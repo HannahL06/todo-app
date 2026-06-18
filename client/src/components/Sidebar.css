@@ -38,8 +38,41 @@
 }
 
 .nav-icon.active {
-  background-color: var(--purple-dark);
+  background-color: var(--purple-main);
   color: var(--sidebar-icon-active);
-  border-color: var(--sidebar-icon-active);
-  box-shadow: 0 4px 12px rgba(139, 95, 191, 0.3);
+  border-color: transparent;
+  box-shadow: 0 8px 16px rgba(141, 106, 216, 0.28);
+}
+
+.sidebar-spacer {
+  flex: 1;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--purple-light);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-logout {
+  font-size: 20px;
+  opacity: 0.6;
+}
+
+.sidebar-logout:hover {
+  opacity: 1;
+  color: #e57373;
 }

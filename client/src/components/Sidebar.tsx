@@ -5,6 +5,8 @@ export type ViewType = 'daily' | 'calendar' | 'lists' | 'search' | 'records'
 interface SidebarProps {
   activeView: ViewType
   onViewChange: (view: ViewType) => void
+  user: { name: string; email: string }
+  onLogout: () => void
 }
 
 const views: Array<{ id: ViewType; icon: string; label: string }> = [
@@ -15,7 +17,7 @@ const views: Array<{ id: ViewType; icon: string; label: string }> = [
   { id: 'records', icon: '📦', label: 'Records' },
 ]
 
-export function Sidebar({ activeView, onViewChange }: SidebarProps) {
+export function Sidebar({ activeView, onViewChange, user, onLogout }: SidebarProps) {
   return (
     <aside className="sidebar" data-testid="sidebar">
       {views.map((view) => (
@@ -30,6 +32,15 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           {view.icon}
         </button>
       ))}
+
+      <div className="sidebar-spacer" />
+
+      <div className="sidebar-user" title={user.email}>
+        <div className="sidebar-avatar">{user.name.charAt(0).toUpperCase()}</div>
+      </div>
+      <button className="nav-icon sidebar-logout" onClick={onLogout} title="Sign out" aria-label="Sign out">
+        ⏻
+      </button>
     </aside>
   )
 }

@@ -1,16 +1,18 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+﻿import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { DailyItemStatus, ItemType, type DailyItem, type Item } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { ReorderDailyItemsDto } from './dto/reorder-daily-items.dto';
+import { UpdateItemDto } from './dto/update-item.dto';
 
 @Injectable()
 export class DailyItemsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async ensureRolloverForDate(targetDate: Date) {
+  private async ensureRolloverForDate(userId: string, targetDate: Date) {
     const latestByItem = await this.prisma.dailyItem.findMany({
       where: {
+        userId,
         date: { lt: targetDate },
         item: {
           isRolling: true,
@@ -22,107 +24,162 @@ export class DailyItemsService {
       distinct: ['itemId'],
     });
 
-    if (latestByItem.length === 0) {
-      return;
-    }
+    if (latestByItem.length === 0) return;
 
     const existingForTargetDate = await this.prisma.dailyItem.findMany({
-      where: { date: targetDate },
+      where: { userId, date: targetDate },
       select: { itemId: true, sortOrder: true },
     });
 
-    const existingItemIds = new Set(existingForTargetDate.map((item) => item.itemId));
-    const maxSortOrder = existingForTargetDate.reduce((max, item) => {
-      if (item.sortOrder == null) {
-        return max;
-      }
-      return Math.max(max, item.sortOrder);
-    }, -1);
-
-    const rolloverCandidates = latestByItem.filter(
-      (item) => item.status !== DailyItemStatus.COMPLETED && !existingItemIds.has(item.itemId),
+    const existingItemIds = new Set(existingForTargetDate.map((d) => d.itemId));
+    const maxSortOrder = existingForTargetDate.reduce(
+      (max, d) => (d.sortOrder != null ? Math.max(max, d.sortOrder) : max),
+      -1,
     );
 
-    if (rolloverCandidates.length === 0) {
-      return;
-    }
+    const candidates = latestByItem.filter(
+      (d) => d.status !== DailyItemStatus.COMPLETED && !existingItemIds.has(d.itemId),
+    );
+
+    if (candidates.length === 0) return;
 
     await this.prisma.dailyItem.createMany({
-      data: rolloverCandidates.map((item, index) => ({
-        itemId: item.itemId,
+      data: candidates.map((d, i) => ({
+        itemId: d.itemId,
+        userId,
         date: targetDate,
         status: DailyItemStatus.UNTOUCHED,
-        sortOrder: maxSortOrder + index + 1,
+        sortOrder: maxSortOrder + i + 1,
       })),
       skipDuplicates: true,
     });
   }
 
-  async searchItems(query: string) {
+  async searchItems(userId: string, query: string, filters?: {
+    from?: string; to?: string; status?: string; type?: string; sortBy?: string; sortOrder?: string;
+  }) {
     const q = query?.trim();
-    if (!q) {
-      return { query: '', items: [] };
+    const where: Record<string, unknown> = { userId, removedFromToday: false };
+
+    if (q && q.length >= 2) {
+      where['item'] = {
+        OR: [
+          { name: { contains: q, mode: 'insensitive' } },
+          { description: { contains: q, mode: 'insensitive' } },
+        ],
+      };
     }
 
+    if (filters?.from || filters?.to) {
+      where['date'] = {
+        ...(filters?.from ? { gte: this.parseDate(filters.from) } : {}),
+        ...(filters?.to ? { lte: this.parseDate(filters.to) } : {}),
+      };
+    }
+
+    if (filters?.status) {
+      const statusMap: Record<string, DailyItemStatus> = {
+        untouched: DailyItemStatus.UNTOUCHED,
+        'in-progress': DailyItemStatus.IN_PROGRESS,
+        completed: DailyItemStatus.COMPLETED,
+      };
+      const mapped = statusMap[filters.status];
+      if (mapped) where['status'] = mapped;
+    }
+
+    if (filters?.type) {
+      const typeMap: Record<string, ItemType> = {
+        task: ItemType.TASK, note: ItemType.NOTE, appointment: ItemType.APPOINTMENT,
+      };
+      const mapped = typeMap[filters.type];
+      if (mapped) {
+        (where['item'] as Record<string, unknown>) = {
+          ...((where['item'] as Record<string, unknown>) ?? {}),
+          type: mapped,
+        };
+      }
+    }
+
+    const sortField = filters?.sortBy === 'status' ? 'status' : 'date';
+    const sortDir = filters?.sortOrder === 'asc' ? 'asc' : 'desc';
+
     const dailyItems = await this.prisma.dailyItem.findMany({
-      where: {
-        removedFromToday: false,
-        item: {
-          OR: [
-            { name: { contains: q, mode: 'insensitive' } },
-            { description: { contains: q, mode: 'insensitive' } },
-          ],
-        },
-      },
-      include: {
-        item: true,
-      },
-      orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
-      take: 50,
+      where,
+      include: { item: true },
+      orderBy: [{ [sortField]: sortDir }, { createdAt: 'desc' }],
+      take: 100,
     });
 
     return {
-      query: q,
-      items: dailyItems.map((item) => ({
-        dailyItemId: item.id,
-        itemId: item.item.id,
-        name: item.item.name,
-        description: item.item.description,
-        type: this.fromPrismaItemType(item.item.type),
-        status: this.fromPrismaStatus(item.status),
-        scheduledDate: item.date.toISOString().slice(0, 10),
+      query: q ?? '',
+      items: dailyItems.map((d) => ({
+        dailyItemId: d.id,
+        itemId: d.item.id,
+        name: d.item.name,
+        description: d.item.description,
+        type: this.fromPrismaItemType(d.item.type),
+        status: this.fromPrismaStatus(d.status),
+        scheduledDate: d.date.toISOString().slice(0, 10),
       })),
     };
   }
 
-  async getDailyItems(date: string) {
-    const normalizedDate = this.parseDate(date);
-    await this.ensureRolloverForDate(normalizedDate);
-    const items = await this.prisma.dailyItem.findMany({
-      where: {
-        date: normalizedDate,
-        removedFromToday: false,
+  async updateItem(itemId: string, userId: string, updateItemDto: UpdateItemDto) {
+    const item = await this.prisma.item.findUnique({ where: { id: itemId } });
+    if (!item || item.userId !== userId) throw new NotFoundException(`Item ${itemId} not found.`);
+
+    const updated = await this.prisma.item.update({
+      where: { id: itemId },
+      data: {
+        ...(updateItemDto.name ? { name: updateItemDto.name.trim() } : {}),
+        ...(updateItemDto.description !== undefined ? { description: updateItemDto.description?.trim() || null } : {}),
+        ...(updateItemDto.isRolling !== undefined ? { isRolling: updateItemDto.isRolling } : {}),
       },
-      include: {
-        item: true,
-      },
-      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+    });
+
+    return { itemId: updated.id, name: updated.name, description: updated.description, isRolling: updated.isRolling };
+  }
+
+  async getPastDates(userId: string) {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    const rows = await this.prisma.dailyItem.findMany({
+      where: { userId, date: { lt: today }, removedFromToday: false },
+      select: { date: true },
+      distinct: ['date'],
+      orderBy: { date: 'desc' },
+      take: 90,
     });
 
     return {
-      date,
-      items: items.map((item) => this.toApiDailyItem(item)),
+      dates: rows.map((r) => ({
+        date: r.date.toISOString().slice(0, 10),
+        weekday: r.date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }),
+      })),
     };
   }
 
-  async createItem(createItemDto: CreateItemDto) {
+  async getDailyItems(date: string, userId: string) {
+    const normalizedDate = this.parseDate(date);
+    await this.ensureRolloverForDate(userId, normalizedDate);
+    const items = await this.prisma.dailyItem.findMany({
+      where: { userId, date: normalizedDate, removedFromToday: false },
+      include: { item: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+    });
+    return { date, items: items.map((d) => this.toApiDailyItem(d)) };
+  }
+
+  async createItem(createItemDto: CreateItemDto, userId: string) {
     const scheduledDate = this.parseDate(createItemDto.scheduledDate);
     const type = this.toPrismaItemType(createItemDto.type ?? 'task');
-    const sortOrder = await this.getNextSortOrder(scheduledDate);
+    const sortOrder = await this.getNextSortOrder(userId, scheduledDate);
 
     const dailyItem = await this.prisma.$transaction(async (tx) => {
       const item = await tx.item.create({
         data: {
+          userId,
           name: createItemDto.name.trim(),
           description: createItemDto.description?.trim() || null,
           type,
@@ -130,130 +187,75 @@ export class DailyItemsService {
           scheduledDate,
         },
       });
-
       return tx.dailyItem.create({
-        data: {
-          itemId: item.id,
-          date: scheduledDate,
-          sortOrder,
-        },
-        include: {
-          item: true,
-        },
+        data: { itemId: item.id, userId, date: scheduledDate, sortOrder },
+        include: { item: true },
       });
     });
 
     return this.toApiDailyItem(dailyItem);
   }
 
-  async cycleStatus(dailyItemId: string) {
-    const existingItem = await this.prisma.dailyItem.findUnique({
+  async cycleStatus(dailyItemId: string, userId: string) {
+    const existing = await this.prisma.dailyItem.findUnique({
       where: { id: dailyItemId },
       include: { item: true },
     });
+    if (!existing || existing.userId !== userId) throw new NotFoundException(`Daily item ${dailyItemId} was not found.`);
 
-    if (!existingItem) {
-      throw new NotFoundException(`Daily item ${dailyItemId} was not found.`);
-    }
-
-    const updatedItem = await this.prisma.dailyItem.update({
+    const updated = await this.prisma.dailyItem.update({
       where: { id: dailyItemId },
-      data: {
-        status: this.nextStatus(existingItem.status),
-      },
-      include: {
-        item: true,
-      },
+      data: { status: this.nextStatus(existing.status) },
+      include: { item: true },
     });
-
-    return this.toApiDailyItem(updatedItem);
+    return this.toApiDailyItem(updated);
   }
 
-  async removeForToday(dailyItemId: string) {
-    const existingItem = await this.prisma.dailyItem.findUnique({
-      where: { id: dailyItemId },
-      select: { id: true },
-    });
-
-    if (!existingItem) {
-      throw new NotFoundException(`Daily item ${dailyItemId} was not found.`);
-    }
-
-    await this.prisma.dailyItem.update({
-      where: { id: dailyItemId },
-      data: { removedFromToday: true },
-    });
-
+  async removeForToday(dailyItemId: string, userId: string) {
+    const existing = await this.prisma.dailyItem.findUnique({ where: { id: dailyItemId }, select: { id: true, userId: true } });
+    if (!existing || existing.userId !== userId) throw new NotFoundException(`Daily item ${dailyItemId} was not found.`);
+    await this.prisma.dailyItem.update({ where: { id: dailyItemId }, data: { removedFromToday: true } });
     return { success: true };
   }
 
-  async stopRolling(dailyItemId: string) {
-    const existingItem = await this.prisma.dailyItem.findUnique({
-      where: { id: dailyItemId },
-      select: { id: true, itemId: true },
-    });
-
-    if (!existingItem) {
-      throw new NotFoundException(`Daily item ${dailyItemId} was not found.`);
-    }
-
+  async stopRolling(dailyItemId: string, userId: string) {
+    const existing = await this.prisma.dailyItem.findUnique({ where: { id: dailyItemId }, select: { id: true, itemId: true, userId: true } });
+    if (!existing || existing.userId !== userId) throw new NotFoundException(`Daily item ${dailyItemId} was not found.`);
     await this.prisma.$transaction([
-      this.prisma.item.update({
-        where: { id: existingItem.itemId },
-        data: { isRolling: false },
-      }),
-      this.prisma.dailyItem.update({
-        where: { id: dailyItemId },
-        data: { removedFromToday: true },
-      }),
+      this.prisma.item.update({ where: { id: existing.itemId }, data: { isRolling: false } }),
+      this.prisma.dailyItem.update({ where: { id: dailyItemId }, data: { removedFromToday: true } }),
     ]);
-
     return { success: true };
   }
 
-  async reorderDailyItems(reorderDailyItemsDto: ReorderDailyItemsDto) {
-    const date = this.parseDate(reorderDailyItemsDto.date);
-    const orderedIds = reorderDailyItemsDto.orderedDailyItemIds;
+  async reorderDailyItems(dto: ReorderDailyItemsDto, userId: string) {
+    const date = this.parseDate(dto.date);
+    const orderedIds = dto.orderedDailyItemIds;
 
     const dailyItems = await this.prisma.dailyItem.findMany({
-      where: {
-        date,
-        removedFromToday: false,
-      },
+      where: { userId, date, removedFromToday: false },
       select: { id: true },
     });
 
-    const existingIds = new Set(dailyItems.map((item) => item.id));
-    if (orderedIds.length !== dailyItems.length) {
-      throw new BadRequestException('orderedDailyItemIds must include every item in the selected day.');
-    }
-
+    const existingIds = new Set(dailyItems.map((d) => d.id));
+    if (orderedIds.length !== dailyItems.length) throw new BadRequestException('orderedDailyItemIds must include every item in the selected day.');
     for (const id of orderedIds) {
-      if (!existingIds.has(id)) {
-        throw new BadRequestException(`Daily item ${id} is not part of ${reorderDailyItemsDto.date}.`);
-      }
+      if (!existingIds.has(id)) throw new BadRequestException(`Daily item ${id} is not part of ${dto.date}.`);
     }
 
     await this.prisma.$transaction(
-      orderedIds.map((id, index) =>
-        this.prisma.dailyItem.update({
-          where: { id },
-          data: { sortOrder: index },
-        }),
-      ),
+      orderedIds.map((id, index) => this.prisma.dailyItem.update({ where: { id }, data: { sortOrder: index } })),
     );
-
     return { success: true };
   }
 
-  private async getNextSortOrder(date: Date) {
-    const latestDailyItem = await this.prisma.dailyItem.findFirst({
-      where: { date, removedFromToday: false },
+  private async getNextSortOrder(userId: string, date: Date) {
+    const latest = await this.prisma.dailyItem.findFirst({
+      where: { userId, date, removedFromToday: false },
       orderBy: { sortOrder: 'desc' },
       select: { sortOrder: true },
     });
-
-    return (latestDailyItem?.sortOrder ?? -1) + 1;
+    return (latest?.sortOrder ?? -1) + 1;
   }
 
   private parseDate(date: string) {

@@ -46,7 +46,10 @@ export function CalendarView() {
       const entries = await Promise.all(
         days.map(async (day) => {
           const date = formatDate(year, month, day)
-          const response = await fetch(`${API_BASE_URL}/daily-items?date=${date}`)
+          const token = localStorage.getItem('auth_token')
+          const response = await fetch(`${API_BASE_URL}/daily-items?date=${date}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          })
           if (!response.ok) {
             return [date, []] as const
           }

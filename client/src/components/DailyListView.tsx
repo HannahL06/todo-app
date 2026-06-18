@@ -1,6 +1,6 @@
 import { useEffect, useState, type DragEvent } from 'react'
 import { CreateItemModal } from './CreateItemModal'
-import { createItem, removeItemForToday, stopItemRolling } from '../api/items'
+import { createItem, removeItemForToday, stopItemRolling, updateItem } from '../api/items'
 import './DailyListView.css'
 
 type ItemType = 'task' | 'note' | 'appointment'
@@ -83,6 +83,10 @@ export function DailyListView() {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [editingItem, setEditingItem] = useState<DailyItem | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [editSaving, setEditSaving] = useState(false)
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null)
   const [dragOverItemId, setDragOverItemId] = useState<string | null>(null)
 
@@ -95,7 +99,10 @@ export function DailyListView() {
     setErrorMessage(null)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/daily-items?date=${date}`)
+      const token = localStorage.getItem('auth_token')
+      const response = await fetch(`${API_BASE_URL}/daily-items?date=${date}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
 
       if (!response.ok) {
         throw new Error('Could not load the daily list.')
@@ -130,8 +137,10 @@ export function DailyListView() {
     )
 
     try {
+      const token = localStorage.getItem('auth_token')
       const response = await fetch(`${API_BASE_URL}/daily-items/${dailyItemId}/cycle-status`, {
         method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
 
       if (!response.ok) {
@@ -190,6 +199,35 @@ export function DailyListView() {
     }
   }
 
+  function openEditModal(item: DailyItem) {
+    setEditingItem(item)
+    setEditName(item.name)
+    setEditDescription(item.description ?? '')
+  }
+
+  async function handleSaveEdit() {
+    if (!editingItem) return
+    setEditSaving(true)
+    try {
+      const updated = await updateItem(editingItem.itemId, {
+        name: editName.trim() || editingItem.name,
+        description: editDescription.trim() || null,
+      })
+      setItems((current) =>
+        current.map((i) =>
+          i.itemId === editingItem.itemId
+            ? { ...i, name: updated.name, description: updated.description }
+            : i,
+        ),
+      )
+      setEditingItem(null)
+    } catch {
+      setErrorMessage('Could not save changes.')
+    } finally {
+      setEditSaving(false)
+    }
+  }
+
   function reorderItems(currentItems: DailyItem[], sourceId: string, targetId: string): DailyItem[] {
     const sourceIndex = currentItems.findIndex((item) => item.dailyItemId === sourceId)
     const targetIndex = currentItems.findIndex((item) => item.dailyItemId === targetId)
@@ -205,10 +243,12 @@ export function DailyListView() {
   }
 
   async function persistReorder(reorderedItems: DailyItem[]) {
+    const token = localStorage.getItem('auth_token')
     const response = await fetch(`${API_BASE_URL}/daily-items/reorder`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify({
         date: selectedDate,
@@ -352,8 +392,9 @@ export function DailyListView() {
                     draggable
                     onDragStart={(event) => handleDragStart(item.dailyItemId, event)}
                     onDragEnd={handleDragEnd}
-                    title="Drag to reorder"
+                    title="Drag to reorder — click to edit"
                     data-testid="item-drag-handle"
+                    onClick={() => openEditModal(item)}
                   >
                     {item.name}
                   </div>
@@ -406,6 +447,44 @@ export function DailyListView() {
           onSubmit={handleItemCreated}
           initialDate={selectedDate}
         />
+      )}
+
+      {editingItem && (
+        <div className="modal-overlay" onClick={() => setEditingItem(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="edit-item-modal">
+            <h2 className="modal-header">Edit Item</h2>
+            <div className="create-form">
+              <div className="form-group">
+                <label className="form-label">Name *</label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="form-input"
+                  autoFocus
+                  data-testid="edit-name-input"
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSaveEdit() }}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <textarea
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  className="form-textarea"
+                  rows={3}
+                  data-testid="edit-description-input"
+                />
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={() => setEditingItem(null)} disabled={editSaving}>Cancel</button>
+                <button className="btn btn-primary" onClick={handleSaveEdit} disabled={editSaving || !editName.trim()}>
+                  {editSaving ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

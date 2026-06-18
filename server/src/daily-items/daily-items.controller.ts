@@ -1,44 +1,84 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Request, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { DailyItemsService } from './daily-items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { ReorderDailyItemsDto } from './dto/reorder-daily-items.dto';
-import { DailyItemsService } from './daily-items.service';
+import { UpdateItemDto } from './dto/update-item.dto';
 
+interface AuthRequest {
+  user: {
+    userId: string;
+    email: string;
+  };
+}
+
+@UseGuards(JwtAuthGuard)
 @Controller('api/v1')
 export class DailyItemsController {
   constructor(private readonly dailyItemsService: DailyItemsService) {}
 
   @Get('daily-items')
-  getDailyItems(@Query('date') date: string) {
-    return this.dailyItemsService.getDailyItems(date);
+  getDailyItems(@Query('date') date: string, @Request() req: AuthRequest) {
+    return this.dailyItemsService.getDailyItems(date, req.user.userId);
   }
 
   @Get('items/search')
-  searchItems(@Query('q') query: string) {
-    return this.dailyItemsService.searchItems(query);
+  searchItems(
+    @Request() req: AuthRequest,
+    @Query('q') query: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+    @Query('status') status?: string,
+    @Query('type') type?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: string,
+  ) {
+    return this.dailyItemsService.searchItems(req.user.userId, query, {
+      from,
+      to,
+      status,
+      type,
+      sortBy,
+      sortOrder,
+    });
+  }
+
+  @Get('records/dates')
+  getPastDates(@Request() req: AuthRequest) {
+    return this.dailyItemsService.getPastDates(req.user.userId);
+  }
+
+  @Patch('items/:itemId')
+  updateItem(
+    @Param('itemId') itemId: string,
+    @Body() updateItemDto: UpdateItemDto,
+    @Request() req: AuthRequest,
+  ) {
+    return this.dailyItemsService.updateItem(itemId, req.user.userId, updateItemDto);
   }
 
   @Post('items')
-  createItem(@Body() createItemDto: CreateItemDto) {
-    return this.dailyItemsService.createItem(createItemDto);
+  createItem(@Body() createItemDto: CreateItemDto, @Request() req: AuthRequest) {
+    return this.dailyItemsService.createItem(createItemDto, req.user.userId);
   }
 
   @Post('daily-items/:dailyItemId/cycle-status')
-  cycleStatus(@Param('dailyItemId') dailyItemId: string) {
-    return this.dailyItemsService.cycleStatus(dailyItemId);
+  cycleStatus(@Param('dailyItemId') dailyItemId: string, @Request() req: AuthRequest) {
+    return this.dailyItemsService.cycleStatus(dailyItemId, req.user.userId);
   }
 
   @Post('daily-items/:dailyItemId/remove-today')
-  removeForToday(@Param('dailyItemId') dailyItemId: string) {
-    return this.dailyItemsService.removeForToday(dailyItemId);
+  removeForToday(@Param('dailyItemId') dailyItemId: string, @Request() req: AuthRequest) {
+    return this.dailyItemsService.removeForToday(dailyItemId, req.user.userId);
   }
 
   @Post('daily-items/:dailyItemId/stop-rolling')
-  stopRolling(@Param('dailyItemId') dailyItemId: string) {
-    return this.dailyItemsService.stopRolling(dailyItemId);
+  stopRolling(@Param('dailyItemId') dailyItemId: string, @Request() req: AuthRequest) {
+    return this.dailyItemsService.stopRolling(dailyItemId, req.user.userId);
   }
 
   @Post('daily-items/reorder')
-  reorderDailyItems(@Body() reorderDailyItemsDto: ReorderDailyItemsDto) {
-    return this.dailyItemsService.reorderDailyItems(reorderDailyItemsDto);
+  reorderDailyItems(@Body() reorderDailyItemsDto: ReorderDailyItemsDto, @Request() req: AuthRequest) {
+    return this.dailyItemsService.reorderDailyItems(reorderDailyItemsDto, req.user.userId);
   }
 }

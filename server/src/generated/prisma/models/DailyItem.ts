@@ -37,6 +37,7 @@ export type DailyItemSumAggregateOutputType = {
 export type DailyItemMinAggregateOutputType = {
   id: string | null
   itemId: string | null
+  userId: string | null
   date: Date | null
   status: $Enums.DailyItemStatus | null
   notes: string | null
@@ -49,6 +50,7 @@ export type DailyItemMinAggregateOutputType = {
 export type DailyItemMaxAggregateOutputType = {
   id: string | null
   itemId: string | null
+  userId: string | null
   date: Date | null
   status: $Enums.DailyItemStatus | null
   notes: string | null
@@ -61,6 +63,7 @@ export type DailyItemMaxAggregateOutputType = {
 export type DailyItemCountAggregateOutputType = {
   id: number
   itemId: number
+  userId: number
   date: number
   status: number
   notes: number
@@ -83,6 +86,7 @@ export type DailyItemSumAggregateInputType = {
 export type DailyItemMinAggregateInputType = {
   id?: true
   itemId?: true
+  userId?: true
   date?: true
   status?: true
   notes?: true
@@ -95,6 +99,7 @@ export type DailyItemMinAggregateInputType = {
 export type DailyItemMaxAggregateInputType = {
   id?: true
   itemId?: true
+  userId?: true
   date?: true
   status?: true
   notes?: true
@@ -107,6 +112,7 @@ export type DailyItemMaxAggregateInputType = {
 export type DailyItemCountAggregateInputType = {
   id?: true
   itemId?: true
+  userId?: true
   date?: true
   status?: true
   notes?: true
@@ -206,6 +212,7 @@ export type DailyItemGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 export type DailyItemGroupByOutputType = {
   id: string
   itemId: string
+  userId: string
   date: Date
   status: $Enums.DailyItemStatus
   notes: string | null
@@ -241,6 +248,7 @@ export type DailyItemWhereInput = {
   NOT?: Prisma.DailyItemWhereInput | Prisma.DailyItemWhereInput[]
   id?: Prisma.StringFilter<"DailyItem"> | string
   itemId?: Prisma.StringFilter<"DailyItem"> | string
+  userId?: Prisma.StringFilter<"DailyItem"> | string
   date?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
   status?: Prisma.EnumDailyItemStatusFilter<"DailyItem"> | $Enums.DailyItemStatus
   notes?: Prisma.StringNullableFilter<"DailyItem"> | string | null
@@ -249,11 +257,13 @@ export type DailyItemWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
   item?: Prisma.XOR<Prisma.ItemScalarRelationFilter, Prisma.ItemWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type DailyItemOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   itemId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   date?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -262,6 +272,7 @@ export type DailyItemOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   item?: Prisma.ItemOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type DailyItemWhereUniqueInput = Prisma.AtLeast<{
@@ -271,6 +282,7 @@ export type DailyItemWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.DailyItemWhereInput[]
   NOT?: Prisma.DailyItemWhereInput | Prisma.DailyItemWhereInput[]
   itemId?: Prisma.StringFilter<"DailyItem"> | string
+  userId?: Prisma.StringFilter<"DailyItem"> | string
   date?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
   status?: Prisma.EnumDailyItemStatusFilter<"DailyItem"> | $Enums.DailyItemStatus
   notes?: Prisma.StringNullableFilter<"DailyItem"> | string | null
@@ -279,11 +291,13 @@ export type DailyItemWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
   item?: Prisma.XOR<Prisma.ItemScalarRelationFilter, Prisma.ItemWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "itemId_date">
 
 export type DailyItemOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   itemId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   date?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -304,6 +318,7 @@ export type DailyItemScalarWhereWithAggregatesInput = {
   NOT?: Prisma.DailyItemScalarWhereWithAggregatesInput | Prisma.DailyItemScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"DailyItem"> | string
   itemId?: Prisma.StringWithAggregatesFilter<"DailyItem"> | string
+  userId?: Prisma.StringWithAggregatesFilter<"DailyItem"> | string
   date?: Prisma.DateTimeWithAggregatesFilter<"DailyItem"> | Date | string
   status?: Prisma.EnumDailyItemStatusWithAggregatesFilter<"DailyItem"> | $Enums.DailyItemStatus
   notes?: Prisma.StringNullableWithAggregatesFilter<"DailyItem"> | string | null
@@ -323,11 +338,13 @@ export type DailyItemCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   item: Prisma.ItemCreateNestedOneWithoutDailyItemsInput
+  user: Prisma.UserCreateNestedOneWithoutDailyItemsInput
 }
 
 export type DailyItemUncheckedCreateInput = {
   id?: string
   itemId: string
+  userId: string
   date: Date | string
   status?: $Enums.DailyItemStatus
   notes?: string | null
@@ -347,11 +364,13 @@ export type DailyItemUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   item?: Prisma.ItemUpdateOneRequiredWithoutDailyItemsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutDailyItemsNestedInput
 }
 
 export type DailyItemUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumDailyItemStatusFieldUpdateOperationsInput | $Enums.DailyItemStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -364,6 +383,7 @@ export type DailyItemUncheckedUpdateInput = {
 export type DailyItemCreateManyInput = {
   id?: string
   itemId: string
+  userId: string
   date: Date | string
   status?: $Enums.DailyItemStatus
   notes?: string | null
@@ -387,6 +407,7 @@ export type DailyItemUpdateManyMutationInput = {
 export type DailyItemUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumDailyItemStatusFieldUpdateOperationsInput | $Enums.DailyItemStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -414,6 +435,7 @@ export type DailyItemItemIdDateCompoundUniqueInput = {
 export type DailyItemCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   itemId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   date?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrder
@@ -430,6 +452,7 @@ export type DailyItemAvgOrderByAggregateInput = {
 export type DailyItemMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   itemId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   date?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrder
@@ -442,6 +465,7 @@ export type DailyItemMaxOrderByAggregateInput = {
 export type DailyItemMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   itemId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   date?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrder
@@ -453,6 +477,48 @@ export type DailyItemMinOrderByAggregateInput = {
 
 export type DailyItemSumOrderByAggregateInput = {
   sortOrder?: Prisma.SortOrder
+}
+
+export type DailyItemCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.DailyItemCreateWithoutUserInput, Prisma.DailyItemUncheckedCreateWithoutUserInput> | Prisma.DailyItemCreateWithoutUserInput[] | Prisma.DailyItemUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.DailyItemCreateOrConnectWithoutUserInput | Prisma.DailyItemCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.DailyItemCreateManyUserInputEnvelope
+  connect?: Prisma.DailyItemWhereUniqueInput | Prisma.DailyItemWhereUniqueInput[]
+}
+
+export type DailyItemUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.DailyItemCreateWithoutUserInput, Prisma.DailyItemUncheckedCreateWithoutUserInput> | Prisma.DailyItemCreateWithoutUserInput[] | Prisma.DailyItemUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.DailyItemCreateOrConnectWithoutUserInput | Prisma.DailyItemCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.DailyItemCreateManyUserInputEnvelope
+  connect?: Prisma.DailyItemWhereUniqueInput | Prisma.DailyItemWhereUniqueInput[]
+}
+
+export type DailyItemUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.DailyItemCreateWithoutUserInput, Prisma.DailyItemUncheckedCreateWithoutUserInput> | Prisma.DailyItemCreateWithoutUserInput[] | Prisma.DailyItemUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.DailyItemCreateOrConnectWithoutUserInput | Prisma.DailyItemCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.DailyItemUpsertWithWhereUniqueWithoutUserInput | Prisma.DailyItemUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.DailyItemCreateManyUserInputEnvelope
+  set?: Prisma.DailyItemWhereUniqueInput | Prisma.DailyItemWhereUniqueInput[]
+  disconnect?: Prisma.DailyItemWhereUniqueInput | Prisma.DailyItemWhereUniqueInput[]
+  delete?: Prisma.DailyItemWhereUniqueInput | Prisma.DailyItemWhereUniqueInput[]
+  connect?: Prisma.DailyItemWhereUniqueInput | Prisma.DailyItemWhereUniqueInput[]
+  update?: Prisma.DailyItemUpdateWithWhereUniqueWithoutUserInput | Prisma.DailyItemUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.DailyItemUpdateManyWithWhereWithoutUserInput | Prisma.DailyItemUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.DailyItemScalarWhereInput | Prisma.DailyItemScalarWhereInput[]
+}
+
+export type DailyItemUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.DailyItemCreateWithoutUserInput, Prisma.DailyItemUncheckedCreateWithoutUserInput> | Prisma.DailyItemCreateWithoutUserInput[] | Prisma.DailyItemUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.DailyItemCreateOrConnectWithoutUserInput | Prisma.DailyItemCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.DailyItemUpsertWithWhereUniqueWithoutUserInput | Prisma.DailyItemUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.DailyItemCreateManyUserInputEnvelope
+  set?: Prisma.DailyItemWhereUniqueInput | Prisma.DailyItemWhereUniqueInput[]
+  disconnect?: Prisma.DailyItemWhereUniqueInput | Prisma.DailyItemWhereUniqueInput[]
+  delete?: Prisma.DailyItemWhereUniqueInput | Prisma.DailyItemWhereUniqueInput[]
+  connect?: Prisma.DailyItemWhereUniqueInput | Prisma.DailyItemWhereUniqueInput[]
+  update?: Prisma.DailyItemUpdateWithWhereUniqueWithoutUserInput | Prisma.DailyItemUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.DailyItemUpdateManyWithWhereWithoutUserInput | Prisma.DailyItemUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.DailyItemScalarWhereInput | Prisma.DailyItemScalarWhereInput[]
 }
 
 export type DailyItemCreateNestedManyWithoutItemInput = {
@@ -509,8 +575,21 @@ export type NullableIntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type DailyItemCreateWithoutItemInput = {
+export type DailyItemCreateWithoutUserInput = {
   id?: string
+  date: Date | string
+  status?: $Enums.DailyItemStatus
+  notes?: string | null
+  sortOrder?: number | null
+  removedFromToday?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  item: Prisma.ItemCreateNestedOneWithoutDailyItemsInput
+}
+
+export type DailyItemUncheckedCreateWithoutUserInput = {
+  id?: string
+  itemId: string
   date: Date | string
   status?: $Enums.DailyItemStatus
   notes?: string | null
@@ -520,8 +599,63 @@ export type DailyItemCreateWithoutItemInput = {
   updatedAt?: Date | string
 }
 
+export type DailyItemCreateOrConnectWithoutUserInput = {
+  where: Prisma.DailyItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.DailyItemCreateWithoutUserInput, Prisma.DailyItemUncheckedCreateWithoutUserInput>
+}
+
+export type DailyItemCreateManyUserInputEnvelope = {
+  data: Prisma.DailyItemCreateManyUserInput | Prisma.DailyItemCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type DailyItemUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.DailyItemWhereUniqueInput
+  update: Prisma.XOR<Prisma.DailyItemUpdateWithoutUserInput, Prisma.DailyItemUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.DailyItemCreateWithoutUserInput, Prisma.DailyItemUncheckedCreateWithoutUserInput>
+}
+
+export type DailyItemUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.DailyItemWhereUniqueInput
+  data: Prisma.XOR<Prisma.DailyItemUpdateWithoutUserInput, Prisma.DailyItemUncheckedUpdateWithoutUserInput>
+}
+
+export type DailyItemUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.DailyItemScalarWhereInput
+  data: Prisma.XOR<Prisma.DailyItemUpdateManyMutationInput, Prisma.DailyItemUncheckedUpdateManyWithoutUserInput>
+}
+
+export type DailyItemScalarWhereInput = {
+  AND?: Prisma.DailyItemScalarWhereInput | Prisma.DailyItemScalarWhereInput[]
+  OR?: Prisma.DailyItemScalarWhereInput[]
+  NOT?: Prisma.DailyItemScalarWhereInput | Prisma.DailyItemScalarWhereInput[]
+  id?: Prisma.StringFilter<"DailyItem"> | string
+  itemId?: Prisma.StringFilter<"DailyItem"> | string
+  userId?: Prisma.StringFilter<"DailyItem"> | string
+  date?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
+  status?: Prisma.EnumDailyItemStatusFilter<"DailyItem"> | $Enums.DailyItemStatus
+  notes?: Prisma.StringNullableFilter<"DailyItem"> | string | null
+  sortOrder?: Prisma.IntNullableFilter<"DailyItem"> | number | null
+  removedFromToday?: Prisma.BoolFilter<"DailyItem"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
+}
+
+export type DailyItemCreateWithoutItemInput = {
+  id?: string
+  date: Date | string
+  status?: $Enums.DailyItemStatus
+  notes?: string | null
+  sortOrder?: number | null
+  removedFromToday?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutDailyItemsInput
+}
+
 export type DailyItemUncheckedCreateWithoutItemInput = {
   id?: string
+  userId: string
   date: Date | string
   status?: $Enums.DailyItemStatus
   notes?: string | null
@@ -557,23 +691,57 @@ export type DailyItemUpdateManyWithWhereWithoutItemInput = {
   data: Prisma.XOR<Prisma.DailyItemUpdateManyMutationInput, Prisma.DailyItemUncheckedUpdateManyWithoutItemInput>
 }
 
-export type DailyItemScalarWhereInput = {
-  AND?: Prisma.DailyItemScalarWhereInput | Prisma.DailyItemScalarWhereInput[]
-  OR?: Prisma.DailyItemScalarWhereInput[]
-  NOT?: Prisma.DailyItemScalarWhereInput | Prisma.DailyItemScalarWhereInput[]
-  id?: Prisma.StringFilter<"DailyItem"> | string
-  itemId?: Prisma.StringFilter<"DailyItem"> | string
-  date?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
-  status?: Prisma.EnumDailyItemStatusFilter<"DailyItem"> | $Enums.DailyItemStatus
-  notes?: Prisma.StringNullableFilter<"DailyItem"> | string | null
-  sortOrder?: Prisma.IntNullableFilter<"DailyItem"> | number | null
-  removedFromToday?: Prisma.BoolFilter<"DailyItem"> | boolean
-  createdAt?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"DailyItem"> | Date | string
+export type DailyItemCreateManyUserInput = {
+  id?: string
+  itemId: string
+  date: Date | string
+  status?: $Enums.DailyItemStatus
+  notes?: string | null
+  sortOrder?: number | null
+  removedFromToday?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type DailyItemUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumDailyItemStatusFieldUpdateOperationsInput | $Enums.DailyItemStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  removedFromToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  item?: Prisma.ItemUpdateOneRequiredWithoutDailyItemsNestedInput
+}
+
+export type DailyItemUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumDailyItemStatusFieldUpdateOperationsInput | $Enums.DailyItemStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  removedFromToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type DailyItemUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumDailyItemStatusFieldUpdateOperationsInput | $Enums.DailyItemStatus
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  removedFromToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DailyItemCreateManyItemInput = {
   id?: string
+  userId: string
   date: Date | string
   status?: $Enums.DailyItemStatus
   notes?: string | null
@@ -592,10 +760,12 @@ export type DailyItemUpdateWithoutItemInput = {
   removedFromToday?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutDailyItemsNestedInput
 }
 
 export type DailyItemUncheckedUpdateWithoutItemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumDailyItemStatusFieldUpdateOperationsInput | $Enums.DailyItemStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -607,6 +777,7 @@ export type DailyItemUncheckedUpdateWithoutItemInput = {
 
 export type DailyItemUncheckedUpdateManyWithoutItemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumDailyItemStatusFieldUpdateOperationsInput | $Enums.DailyItemStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -621,6 +792,7 @@ export type DailyItemUncheckedUpdateManyWithoutItemInput = {
 export type DailyItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   itemId?: boolean
+  userId?: boolean
   date?: boolean
   status?: boolean
   notes?: boolean
@@ -629,11 +801,13 @@ export type DailyItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   createdAt?: boolean
   updatedAt?: boolean
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["dailyItem"]>
 
 export type DailyItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   itemId?: boolean
+  userId?: boolean
   date?: boolean
   status?: boolean
   notes?: boolean
@@ -642,11 +816,13 @@ export type DailyItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   createdAt?: boolean
   updatedAt?: boolean
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["dailyItem"]>
 
 export type DailyItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   itemId?: boolean
+  userId?: boolean
   date?: boolean
   status?: boolean
   notes?: boolean
@@ -655,11 +831,13 @@ export type DailyItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   createdAt?: boolean
   updatedAt?: boolean
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["dailyItem"]>
 
 export type DailyItemSelectScalar = {
   id?: boolean
   itemId?: boolean
+  userId?: boolean
   date?: boolean
   status?: boolean
   notes?: boolean
@@ -669,25 +847,30 @@ export type DailyItemSelectScalar = {
   updatedAt?: boolean
 }
 
-export type DailyItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "itemId" | "date" | "status" | "notes" | "sortOrder" | "removedFromToday" | "createdAt" | "updatedAt", ExtArgs["result"]["dailyItem"]>
+export type DailyItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "itemId" | "userId" | "date" | "status" | "notes" | "sortOrder" | "removedFromToday" | "createdAt" | "updatedAt", ExtArgs["result"]["dailyItem"]>
 export type DailyItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type DailyItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type DailyItemIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $DailyItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "DailyItem"
   objects: {
     item: Prisma.$ItemPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     itemId: string
+    userId: string
     date: Date
     status: $Enums.DailyItemStatus
     notes: string | null
@@ -1090,6 +1273,7 @@ readonly fields: DailyItemFieldRefs;
 export interface Prisma__DailyItemClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   item<T extends Prisma.ItemDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ItemDefaultArgs<ExtArgs>>): Prisma.Prisma__ItemClient<runtime.Types.Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1121,6 +1305,7 @@ export interface Prisma__DailyItemClient<T, Null = never, ExtArgs extends runtim
 export interface DailyItemFieldRefs {
   readonly id: Prisma.FieldRef<"DailyItem", 'String'>
   readonly itemId: Prisma.FieldRef<"DailyItem", 'String'>
+  readonly userId: Prisma.FieldRef<"DailyItem", 'String'>
   readonly date: Prisma.FieldRef<"DailyItem", 'DateTime'>
   readonly status: Prisma.FieldRef<"DailyItem", 'DailyItemStatus'>
   readonly notes: Prisma.FieldRef<"DailyItem", 'String'>

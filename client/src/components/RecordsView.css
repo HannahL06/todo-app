@@ -5,11 +5,114 @@
   background-color: var(--bg-primary);
 }
 
+.records-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.records-sidebar {
+  width: 180px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--spacing-md) var(--spacing-sm);
+  background-color: var(--bg-secondary);
+}
+
+.record-date-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 150ms ease;
+  width: 100%;
+}
+
+.record-date-btn:hover {
+  background-color: var(--bg-hover);
+}
+
+.record-date-btn.active {
+  background-color: var(--purple-main);
+}
+
+.record-date-btn.active .record-date-day,
+.record-date-btn.active .record-date-val {
+  color: #fff;
+}
+
+.record-date-day {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+
+.record-date-val {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.records-detail {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-xl);
+}
+
+.record-detail-heading {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.record-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.record-item-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--bg-tertiary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.record-item-name {
+  flex: 1;
+  font-size: var(--font-md);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.record-item-desc {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* legacy — keep for existing CSS references */
 .records-container {
   flex: 1;
   overflow-y: auto;
   padding: var(--spacing-xl);
 }
+
 
 .records-grid {
   display: grid;
